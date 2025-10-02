@@ -7,9 +7,9 @@ from dotenv import load_dotenv
 def get_data(city):
     load_dotenv()
     api_key = os.getenv("API_KEY")
-    url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid="
+    url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric"
 
-    response = requests.get(f"{url}{api_key}")
+    response = requests.get(url)
     # проверка подключения
     if response.status_code == 200:
         json_data = json.dumps(response.json(), indent=4, ensure_ascii=False)
@@ -19,7 +19,7 @@ def get_data(city):
 
     # переделываем данные в дикт
     data = json.loads(json_data)
-    print(data)
+    print(json_data)
     return data 
 
 if __name__ == "__main__":
