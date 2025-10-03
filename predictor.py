@@ -72,3 +72,8 @@ def generate_weather_data(days=365):
     })
     
     return df
+
+# вычислить за 365 и запринтовать
+weather_df = generate_weather_data(365)
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+    print(weather_df)
