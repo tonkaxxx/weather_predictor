@@ -5,6 +5,8 @@ import torch.optim as optim
 import numpy as np
 import pandas as pd
 
+np.set_printoptions(suppress=True, precision=2) # это чтобы не было ешек в числах
+
 # для дебага
 def get_season(date):
     month = date.month
@@ -73,7 +75,23 @@ def generate_weather_data(days=365):
     
     return df
 
-# вычислить за 365 и запринтовать
+# разделяем данные на значение и лейбл
+def split_data(data, past_size=5, forecast_horizon=3):
+    x, y = [], []
+    data_features = data[['temperature', 'humidity', 'pressure', 'wind_speed']].values
+    
+    # проходим по всему датасету
+    for i in range(len(data) - past_size - forecast_horizon + 1):
+        # значения: последние past_size дней
+        past = data_features[i:(i + past_size)]
+        # лейбл: следующие `forecast_horizon` дней
+        future = data_features[i + past_size : i + past_size + forecast_horizon]
+        
+        x.append(past)
+        y.append(future)
+    
+    return np.array(x), np.array(y)
+
+# генерируем данные
 weather_df = generate_weather_data(365)
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-    print(weather_df)
+x, y = split_data(weather_df, past_size=5, forecast_horizon=3)
