@@ -84,7 +84,7 @@ def split_data(data, past_size=5, forecast_horizon=3):
     for i in range(len(data) - past_size - forecast_horizon + 1):
         # значения: последние past_size дней
         past = data_features[i:(i + past_size)]
-        # лейбл: следующие `forecast_horizon` дней
+        # лейбл: следующие forecast_horizon дней
         future = data_features[i + past_size : i + past_size + forecast_horizon]
         
         x.append(past)
@@ -95,3 +95,34 @@ def split_data(data, past_size=5, forecast_horizon=3):
 # генерируем данные
 weather_df = generate_weather_data(365)
 x, y = split_data(weather_df, past_size=5, forecast_horizon=3)
+
+# разделение на train/test
+train_size = int(0.8 * len(x))
+x_train, x_test = x[:train_size], x[train_size:]
+y_train, y_test = y[:train_size], y[train_size:]
+
+# скейлеры для нормализация данных
+scaler_x = StandardScaler()
+scaler_y = StandardScaler()
+
+# решейпим массив из (365, 5, 4) -> (1825, 4)
+x_train_reshaped = x_train.reshape(-1, x_train.shape[-1])
+x_test_reshaped = x_test.reshape(-1, x_test.shape[-1])
+y_train_reshaped = y_train.reshape(-1, y_train.shape[-1])
+y_test_reshaped = y_test.reshape(-1, y_test.shape[-1])
+
+# нормализируем данные (от 0 до 1)
+x_train_scaled = scaler_x.fit_transform(x_train_reshaped).reshape(x_train.shape)
+x_test_scaled = scaler_x.transform(x_test_reshaped).reshape(x_test.shape)
+y_train_scaled = scaler_y.fit_transform(y_train_reshaped).reshape(y_train.shape)
+y_test_scaled = scaler_y.transform(y_test_reshaped).reshape(y_test.shape)
+
+# преобразовываем в тензоры 
+x_train_tensor = torch.FloatTensor(x_train_scaled)
+y_train_tensor = torch.FloatTensor(y_train_scaled)
+x_test_tensor = torch.FloatTensor(x_test_scaled)
+y_test_tensor = torch.FloatTensor(y_test_scaled)
+
+# создаем датасет и даталоадер (обязательно тест данные)
+train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
