@@ -21,8 +21,6 @@ def get_season(date: datetime) -> str:
 
 
 def get_data(city: str) -> dict:
-    """Возвращает данные о погоде в виде словаря"""
-
     load_dotenv()
     api_key = os.getenv("API_KEY")
 
@@ -94,8 +92,47 @@ def from_data_to_dataframe(data: dict) -> pd.DataFrame:
 
     return dataframe
 
+
+
+def from_data_to_dataframe2(data: dict) -> pd.DataFrame:
+    if not data or 'list' not in data:
+        return pd.DataFrame(columns=['season','date','temperature','humidity','pressure','wind_speed'])
+
+    # смящение часового пояса
+    timezone_offset = data.get('city', {}).get('timezone', 0)
+
+    rows = []
+    for item in data['list']:
+        timestamp = item.get('dt')
+        if timestamp is None:
+            continue
+
+        dt_local = datetime.fromtimestamp(timestamp, timezone.utc) + timedelta(seconds=timezone_offset)
+
+        main = item.get('main') or {}
+        wind = item.get('wind') or {}
+
+        rows.append({
+            'season': get_season(dt_local),
+            'date': dt_local,
+            'temperature': main.get('temp'),
+            'humidity': main.get('humidity'),
+            'pressure': main.get('pressure'),
+            'wind_speed': wind.get('speed')
+        })
+
+    dataframe = pd.DataFrame(rows)
+
+    # округление чисел
+    numeric_cols = ['temperature', 'humidity', 'pressure', 'wind_speed']
+    for c in numeric_cols:
+        if c in dataframe.columns:
+            dataframe[c] = pd.to_numeric(dataframe[c], errors='coerce').round(1)
+
+    return dataframe
+
+
 if __name__ == "__main__":
     raw_data = get_data("London")
     df = from_data_to_dataframe(raw_data)
     print(df)
-om/Kvas77/weather_predictor
