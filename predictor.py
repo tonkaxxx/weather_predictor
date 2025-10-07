@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+from sklearn.preprocessing import StandardScaler
 
 import numpy as np
 import pandas as pd
@@ -126,3 +128,122 @@ y_test_tensor = torch.FloatTensor(y_test_scaled)
 # создаем датасет и даталоадер (обязательно тест данные)
 train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+
+class WeatherLSTM(nn.Module):
+    def __init__(self, input_size=4, hidden_size=64, num_layers=2, output_size=12):
+        super(WeatherLSTM, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=0.1)
+        self.fc = nn.Sequential(
+            nn.Linear(hidden_size, 64),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(64, output_size)
+        )
+    
+    def forward(self, x):
+        # инитим гейты лстм
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)
+        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)
+        
+        # прямой проход через лстм
+        out, _ = self.lstm(x, (h0, c0))
+        
+        # берем только ласт выход
+        out = out[:, -1, :]
+        out = self.fc(out)
+        
+        # ретурним [batch_size, 3 дня, 4 параметра]
+        return out.view(-1, 3, 4)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = WeatherLSTM().to(device)
+print(model)
+
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-52)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, factor=0.5)
+
+# обучение модели
+num_epochs = 150
+train_losses = []
+val_losses = []
+
+for epoch in range(num_epochs):
+    model.train()
+    epoch_train_loss = 0
+    
+    for batch_x, batch_y in train_loader:
+        batch_x, batch_y = batch_x.to(device), batch_y.to(device)
+        
+        # проходим вперед
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+        
+        # проходим назад
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        epoch_train_loss += loss.item()
+    
+    # валидациямодели
+    model.eval()
+    with torch.no_grad():
+        val_outputs = model(x_test_tensor.to(device))
+        val_loss = criterion(val_outputs, y_test_tensor.to(device))
+    
+    train_losses.append(epoch_train_loss / len(train_loader))
+    val_losses.append(val_loss.item())
+    
+    scheduler.step(val_loss)
+    
+    if (epoch + 1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Train Loss: {epoch_train_loss/len(train_loader):.4f}, Val Loss: {val_loss.item():.4f}')
+
+def predict_weather(model, last_days_data, scaler_x, scaler_y):
+    model.eval()
+    
+    # нормализуем данные
+    last_days_scaled = scaler_x.transform(last_days_data.reshape(-1, 4)).reshape(1, 5, 4)
+    
+    # юзаем torch.no_grad() чтобы не менялись веса
+    with torch.no_grad():
+        input_tensor = torch.FloatTensor(last_days_scaled).to(device)
+        prediction = model(input_tensor)
+    
+    # обратно нормализуем
+    prediction_np = prediction.cpu().numpy().reshape(-1, 4)
+    prediction_original = scaler_y.inverse_transform(prediction_np).reshape(3, 4)
+    
+    return prediction_original
+
+# тестируем на реальных данных
+print("\n" + "="*50)
+print("ПРЕДСКАЗАНИЕ ПОГОДЫ НА 3 ДНЯ")
+print("="*50)
+
+test_sample = x_test[0]  # [5, 4] - 5 дней, 4 параметра
+true_future = y_test[0]  # [3, 4] - реальные значения на следующие 3 дня
+
+prediction = predict_weather(model, test_sample, scaler_x, scaler_y)
+
+parameters = ['температура', 'влажность', 'давление', 'скорость ветра']
+units = ['°C', '%', 'гПа', 'м/с']
+
+print("\nпервые 5 дней:")
+for i in range(5):
+    print(f"день -{5-i}: " + ", ".join([f"{param}: {test_sample[i][j]:.1f}{unit}" 
+    for j, (param, unit) in enumerate(zip(parameters, units))]))
+
+print("\nпредсказания на след 3 дня:")
+for i in range(3):
+    print(f"день +{i+1}: " + ", ".join([f"{param}: {prediction[i][j]:.1f}{unit}" 
+    for j, (param, unit) in enumerate(zip(parameters, units))]))
+
+print("\nреальные значения на след 3 дня:")
+for i in range(3):
+    print(f"день +{i+1}: " + ", ".join([f"{param}: {true_future[i][j]:.1f}{unit}" 
+    for j, (param, unit) in enumerate(zip(parameters, units))]))

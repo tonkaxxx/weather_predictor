@@ -10,15 +10,10 @@ from datetime import datetime, timedelta, timezone
 def get_season(date: datetime) -> str:
     month = date.month
 
-    if 3 <= month <= 5:
-        return 'Весна'
-    elif 6 <= month <= 8:
-        return 'Лето'
-    elif 9 <= month <= 11:
-        return 'Осень'
-    else:
-        return 'Зима'
-
+    if 3 <= month <= 5: return 'Весна'
+    elif 6 <= month <= 8: return 'Лето'
+    elif 9 <= month <= 11: return 'Осень'
+    else: return 'Зима'
 
 def get_data(city: str) -> dict:
     load_dotenv()
@@ -79,7 +74,7 @@ def from_data_to_dataframe(data: dict) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    raw_data = get_data("London")
+    raw_data = get_data("moscow")
     df = from_data_to_dataframe(raw_data)
     print(df)
 
