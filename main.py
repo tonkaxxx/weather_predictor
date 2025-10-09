@@ -73,10 +73,42 @@ def from_data_to_dataframe(data: dict) -> pd.DataFrame:
     return dataframe
 
 
+def get_daily_averages(df: pd.DataFrame) -> list[list[float]]:
+    """
+    Принимает DataFrame с колонками:
+    ['season', 'date', 'temperature', 'humidity', 'pressure', 'wind_speed']
+
+    Возвращает вложенный список вида:
+    [[temperature_avrg, humidity_avrg, pressure_avrg, wind_speed_avrg], ...]
+    по каждому дню.
+    """
+    if df is None or df.empty:
+        return []
+
+    # ставим дату как индекс
+    df = df.set_index('date')
+
+    # группируем по дням и считаем средние значения
+    daily_averages = df.resample('D').agg({
+        'temperature': 'mean',
+        'humidity': 'mean',
+        'pressure': 'mean',
+        'wind_speed': 'mean'
+    })
+
+    # округляем значения
+    daily_averages = daily_averages.round(1)
+
+    # превращаем в список списков
+    result = daily_averages.to_numpy().tolist()
+    return result
+
+
 if __name__ == "__main__":
     raw_data = get_data("moscow")
     df = from_data_to_dataframe(raw_data)
-    print(df)
+    averages = get_daily_averages(df)
+    print(averages)
 
     
 
