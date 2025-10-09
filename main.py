@@ -5,7 +5,7 @@ import pandas as pd
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
-
+from flask import Flask, request, render_template
 
 def get_season(date: datetime) -> str:
     month = date.month
@@ -16,7 +16,8 @@ def get_season(date: datetime) -> str:
     else: return 'Зима'
 
 def get_data(city: str) -> dict:
-    load_dotenv()
+    env_path = os.path.join(os.path.dirname(__file__), 'back', '.env')
+    load_dotenv(env_path)
     api_key = os.getenv("API_KEY")
 
     url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric"
@@ -72,43 +73,66 @@ def from_data_to_dataframe(data: dict) -> pd.DataFrame:
 
     return dataframe
 
+app = Flask(__name__)
 
-def get_daily_averages(df: pd.DataFrame) -> list[list[float]]:
-    """
-    Принимает DataFrame с колонками:
-    ['season', 'date', 'temperature', 'humidity', 'pressure', 'wind_speed']
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    Возвращает вложенный список вида:
-    [[temperature_avrg, humidity_avrg, pressure_avrg, wind_speed_avrg], ...]
-    по каждому дню.
-    """
-    if df is None or df.empty:
-        return []
+@app.route('/get-weather', methods=['POST'])
+def get_weather():
+    city = request.form.get('city')
+    data = get_data(city)
+    print(data)
+    df = from_data_to_dataframe(data)
 
-    # ставим дату как индекс
-    df = df.set_index('date')
-
-    # группируем по дням и считаем средние значения
-    daily_averages = df.resample('D').agg({
-        'temperature': 'mean',
-        'humidity': 'mean',
-        'pressure': 'mean',
-        'wind_speed': 'mean'
-    })
-
-    # округляем значения
-    daily_averages = daily_averages.round(1)
-
-    # превращаем в список списков
-    result = daily_averages.to_numpy().tolist()
-    return result
+    if not df.empty:
+        # Преобразуем DataFrame в красивую HTML таблицу
+        html_table = df.to_html(classes='table table-striped', index=False, border=0)
+        return f"""
+        <html>
+        <head>
+            <title>Погода в {city}</title>
+            <link href="/static/style_website.css" rel="stylesheet">
+            <style>
+                .table {{ width: 100%; border-collapse: collapse; }}
+                .table th, .table td {{ padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }}
+                .table th {{ background-color: #f2f2f2; }}
+                .container {{ max-width: 1200px; margin: 0 auto; padding: 20px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Погода в городе: {city}</h1>
+                {html_table}
+                <br>
+                <a href="/">Назад к поиску</a>
+            </div>
+        </body>
+        </html>
+        """
+    else:
+        return f"""
+        <html>
+        <head>
+            <link href="/static/style_website.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container">
+                <h2>Ошибка</h2>
+                <p>Не удалось получить данные для города: {city}</p>
+                <a href="/">Назад к поиску</a>
+            </div>
+        </body>
+        </html>
+        """
 
 
 if __name__ == "__main__":
     raw_data = get_data("moscow")
     df = from_data_to_dataframe(raw_data)
-    averages = get_daily_averages(df)
-    print(averages)
+    # print(df)
+    app.run(debug=True)
 
     
 
