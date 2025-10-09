@@ -19,7 +19,7 @@ def get_season(date):
     elif 9 <= month <= 11: return 'Осень'
     else: return 'Зима'
 
-def generate_weather_data(days=365):
+def generate_weather_data(days):
     # создаем массив дат 365 с дневным шагом 
     dates = pd.date_range(start='2025-01-01', periods=days, freq='D')
     # создаем ндлист от 1 до кол-ва дней  
@@ -95,7 +95,7 @@ def split_data(data, past_size=5, forecast_horizon=3):
     return np.array(x), np.array(y)
 
 # генерируем данные
-weather_df = generate_weather_data(365)
+weather_df = generate_weather_data(365*5)
 x, y = split_data(weather_df, past_size=5, forecast_horizon=3)
 
 # разделение на train/test
@@ -135,11 +135,11 @@ class WeatherLSTM(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=0.1)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=0.3)
         self.fc = nn.Sequential(
             nn.Linear(hidden_size, 64),
             nn.ReLU(),
-            nn.Dropout(0.1),
+            nn.Dropout(0.3),
             nn.Linear(64, output_size)
         )
     
@@ -163,11 +163,11 @@ model = WeatherLSTM().to(device)
 print(model)
 
 criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-52)
+optimizer = optim.AdamW(model.parameters(), lr=0.0008, weight_decay=1e-4)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=10, factor=0.5)
 
 # обучение модели
-num_epochs = 150
+num_epochs = 120
 train_losses = []
 val_losses = []
 
@@ -247,3 +247,23 @@ print("\nреальные значения на след 3 дня:")
 for i in range(3):
     print(f"день +{i+1}: " + ", ".join([f"{param}: {true_future[i][j]:.1f}{unit}" 
     for j, (param, unit) in enumerate(zip(parameters, units))]))
+
+model.eval()
+with torch.no_grad():
+    test_predictions = model(x_test_tensor.to(device))
+    test_predictions = test_predictions.cpu().numpy()
+    
+    # обратно скейлим и решейпим
+    test_predictions_original = scaler_y.inverse_transform(
+        test_predictions.reshape(-1, 4)
+    ).reshape(-1, 3, 4)
+    
+    y_test_original = scaler_y.inverse_transform(
+        y_test_scaled.reshape(-1, 4)
+    ).reshape(-1, 3, 4)
+
+# вычисляем мае 
+mae = np.mean(np.abs(test_predictions_original - y_test_original), axis=(0, 1))
+print("\nсредняя абсолютная ошибка по параметрам:")
+for param, error, unit in zip(parameters, mae, units):
+    print(f"{param}: {error:.2f} {unit}")
