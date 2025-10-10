@@ -2,12 +2,14 @@ import requests
 import os
 import json
 import pandas as pd
+import joblib
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 from flask import Flask, request, render_template
 
 from back.back import get_season, get_data, get_daily_averages, from_data_to_dataframe
+from back.predictor import predict_weather, load_trained_model
 
 app = Flask(__name__)
 
@@ -65,6 +67,10 @@ def get_weather():
 
 
 if __name__ == "__main__":
+    model = load_trained_model('weather_model.pth')
+    scaler_x = joblib.load('scaler_x.pkl')
+    scaler_y = joblib.load('scaler_y.pkl')
+
     app.run(debug=True)
 
     
