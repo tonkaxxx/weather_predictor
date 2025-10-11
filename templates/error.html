@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Ошибка</h2>
+        <p>Не удалось получить данные для города: {{ city }}</p>
+        <a href="{{ url_for('index') }}">Назад к поиску</a>
+    </div>
+</body>
+</html>

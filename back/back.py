@@ -2,6 +2,9 @@ import requests
 import os
 import json
 import pandas as pd
+import joblib
+import torch
+import numpy as np
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
@@ -97,12 +100,28 @@ def get_daily_averages(df: pd.DataFrame) -> list[list[float]]:
     # округляем значения
     daily_averages = daily_averages.round(1)
 
-    # превращаем в список списков
-    result = daily_averages.to_numpy().tolist()
-    return result
+    # превращаем нлисит
+    result = daily_averages.to_numpy()
+    if len(result) >= 5:
+        last_5_days = result[-5:]
+    return last_5_days
 
 if __name__ == "__main__":
+    from predictor import predict_weather, load_trained_model # вопрос с импортом
+    model = load_trained_model('weather_model.pth')
+    scaler_x = joblib.load('scaler_x.pkl')
+    scaler_y = joblib.load('scaler_y.pkl')
+
     raw_data = get_data("moscow")
     df = from_data_to_dataframe(raw_data)
-    res = get_daily_averages(df)
-    print(res)
+    last_5_days = get_daily_averages(df)
+
+    prediction = predict_weather(model, last_5_days, scaler_x, scaler_y)
+
+    parameters = ['температура', 'влажность', 'давление', 'скорость ветра']
+    units = ['°C', '%', 'гПа', 'м/с']
+
+    print("\nпредсказания на след 3 дня:")
+    for i in range(3):
+        print(f"день +{i+1}: " + ", ".join([f"{param}: {prediction[i][j]:.1f}{unit}" 
+        for j, (param, unit) in enumerate(zip(parameters, units))]))

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Погода в {{ city }}</title>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <style>
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        .table th { background-color: #f2f2f213; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Погода в городе: {{ city }}</h1>
+        {{ html_table|safe }}
+        <br>
+        <a href="{{ url_for('index') }}">Назад к поиску</a>
+        <h1>предсказание нейронки:</h1>
+        <ul>
+            {% for number in temperatures %}
+                <li>{{ "%.2f"|format(number) }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
