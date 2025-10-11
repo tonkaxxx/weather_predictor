@@ -25,7 +25,7 @@ def get_weather():
     last_5_days = get_daily_averages(df)
     prediction = predict_weather(model, last_5_days, scaler_x, scaler_y)
     print(prediction)
-    temperatures = [row[0] for row in prediction]
+    temperatures = [float(row[0]) for row in prediction]
 
     if not df.empty:
         html_table = df.to_html(classes='table table-striped', index=False, border=0)

@@ -3,25 +3,74 @@
 <head>
     <title>Погода в {{ city }}</title>
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-    <style>
-        .table { width: 100%; border-collapse: collapse; }
-        .table th, .table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-        .table th { background-color: #f2f2f213; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Погода в городе: {{ city }}</h1>
-        {{ html_table|safe }}
-        <br>
-        <a href="{{ url_for('index') }}">Назад к поиску</a>
-        <h1>предсказание нейронки:</h1>
-        <ul>
-            {% for number in temperatures %}
-                <li>{{ "%.2f"|format(number) }}</li>
-            {% endfor %}
-        </ul>
+        
+        <div class="content-wrapper">
+            <div class="chart-container">
+                <h2>Прогноз температуры на следующие 3 дня:</h2>
+                <canvas id="weatherChart"></canvas>
+            </div>
+            
+            <div class="table-container">
+                <h2>Исторические данные:</h2>
+                {{ html_table|safe }}
+            </div>
+        </div>
+        
+        <a href="{{ url_for('index') }}" class="back-link">Назад к поиску</a>
+
+        <script>
+            const temps = JSON.parse('{{ temperatures | tojson | safe }}');
+            const days = ['День 1', 'День 2', 'День 3'];
+            
+            new Chart(
+                document.getElementById('weatherChart'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: days,
+                        datasets: [{
+                            label: 'Температура (°C)',
+                            data: temps,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Температура (°C)'
+                                },
+                                beginAtZero: false
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Дни прогноза'
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+        </script>
     </div>
 </body>
 </html>

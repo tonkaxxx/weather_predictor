@@ -80,7 +80,7 @@ def get_daily_averages(df: pd.DataFrame) -> list[list[float]]:
     ['season', 'date', 'temperature', 'humidity', 'pressure', 'wind_speed']
 
     Возвращает вложенный список вида:
-    [[temperature_avrg, humidity_avrg, pressure_avrg, wind_speed_avrg], ...]
+    [[temperature_avrg, humidity_avrg, pressure_avrg, wind_rg],speed_av ...]
     по каждому дню.
     """
     if df is None or df.empty:
