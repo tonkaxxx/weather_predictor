@@ -31,7 +31,7 @@ def get_weather():
         <html>
         <head>
             <title>Погода в {city}</title>
-            <link href="/static/style_website.css" rel="stylesheet">
+            <link href="/static/style.css" rel="stylesheet">
             <style>
                 .table {{ width: 100%; border-collapse: collapse; }}
                 .table th, .table td {{ padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }}
@@ -53,7 +53,7 @@ def get_weather():
         return f"""
         <html>
         <head>
-            <link href="/static/style_website.css" rel="stylesheet">
+            <link href="/static/style.css" rel="stylesheet">
         </head>
         <body>
             <div class="container">
