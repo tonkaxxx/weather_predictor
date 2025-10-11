@@ -11,12 +11,12 @@
         
         <div class="content-wrapper">
             <div class="chart-container">
-                <h2>Прогноз температуры на следующие 3 дня:</h2>
+                <h2>график</h2>
                 <canvas id="weatherChart"></canvas>
             </div>
             
             <div class="table-container">
-                <h2>Исторические данные:</h2>
+                <h2>таблица</h2>
                 {{ html_table|safe }}
             </div>
         </div>
@@ -24,9 +24,13 @@
         <a href="{{ url_for('index') }}" class="back-link">Назад к поиску</a>
 
         <script>
-            const temps = JSON.parse('{{ temperatures | tojson | safe }}');
-            const days = ['День 1', 'День 2', 'День 3'];
-            
+            const real_temps = JSON.parse('{{ real_temperatures | tojson | safe }}');
+            const ai_temps = JSON.parse('{{ temperatures | tojson | safe }}');
+
+            const temps = [...real_temps, ...ai_temps];
+            // иде показывает ошибку, но ее нет. переменную мы подставляем в мейне
+            const days = {{ days }}; 
+
             new Chart(
                 document.getElementById('weatherChart'),
                 {

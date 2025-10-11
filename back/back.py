@@ -51,13 +51,14 @@ def from_data_to_dataframe(data: dict) -> pd.DataFrame:
             continue
 
         dt_local = datetime.fromtimestamp(timestamp, timezone.utc) + timedelta(seconds=timezone_offset)
+        day = dt_local.day
 
         main = item.get('main') or {}
         wind = item.get('wind') or {}
 
         rows.append({
-            'season': get_season(dt_local),
-            'date': dt_local,
+            # 'season': get_season(dt_local),
+            'date': day,
             'temperature': main.get('temp'),
             'humidity': main.get('humidity'),
             'pressure': main.get('pressure'),
@@ -66,45 +67,28 @@ def from_data_to_dataframe(data: dict) -> pd.DataFrame:
 
     dataframe = pd.DataFrame(rows)
 
-    # округление чисел
-    numeric_cols = ['temperature', 'humidity', 'pressure', 'wind_speed']
-    for c in numeric_cols:
-        if c in dataframe.columns:
-            dataframe[c] = dataframe[c].round(1)
-
-    return dataframe
-
-def get_daily_averages(df: pd.DataFrame) -> list[list[float]]:
-    """
-    Принимает DataFrame с колонками:
-    ['season', 'date', 'temperature', 'humidity', 'pressure', 'wind_speed']
-
-    Возвращает вложенный список вида:
-    [[temperature_avrg, humidity_avrg, pressure_avrg, wind_rg],speed_av ...]
-    по каждому дню.
-    """
-    if df is None or df.empty:
-        return []
-
-    # ставим дату как индекс
-    df = df.set_index('date')
-
-    # группируем по дням и считаем средние значения
-    daily_averages = df.resample('D').agg({
+    daily_avg = dataframe.groupby('date').agg({
+        # 'season': 'first',
         'temperature': 'mean',
         'humidity': 'mean',
         'pressure': 'mean',
         'wind_speed': 'mean'
-    })
+    }).round(1)
+    
+    daily_avg = daily_avg.sort_index().head(5)
+    print(daily_avg)
+    return daily_avg
 
-    # округляем значения
-    daily_averages = daily_averages.round(1)
-
+def from_df_to_nlist(df: pd.DataFrame) -> list[list[float]]:
+    if df is None or df.empty:
+        return []
     # превращаем нлисит
-    result = daily_averages.to_numpy()
+    result = df.to_numpy()
     if len(result) >= 5:
         last_5_days = result[-5:]
     return last_5_days
+    
+# def from_nlist_to_df(nlist):
 
 if __name__ == "__main__":
     from predictor import predict_weather, load_trained_model # вопрос с импортом
@@ -114,7 +98,7 @@ if __name__ == "__main__":
 
     raw_data = get_data("moscow")
     df = from_data_to_dataframe(raw_data)
-    last_5_days = get_daily_averages(df)
+    last_5_days = from_df_to_nlist(df)
 
     prediction = predict_weather(model, last_5_days, scaler_x, scaler_y)
 
