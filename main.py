@@ -68,4 +68,4 @@ if __name__ == "__main__":
     scaler_x = joblib.load('scaler_x.pkl')
     scaler_y = joblib.load('scaler_y.pkl')
 
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

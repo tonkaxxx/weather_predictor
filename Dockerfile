@@ -7,5 +7,5 @@ RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 COPY . .
 
-RUN python back/predictor.py
-CMD ["python", "main.py"]
+RUN chmod +x /app/start.sh
+CMD ["/app/start.sh"]
