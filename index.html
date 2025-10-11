@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>График погоды</title>
+    <!-- Подключение Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>График температуры</h1>
+    <!-- Канвас для графика -->
+    <canvas id="myChart" width="800" height="400"></canvas>
+
+    <script>
+        // Функция для получения данных и отображения графика
+        async function fetchAndPlot() {
+            try {
+                const response = await fetch('/get_weather', {methods:['GET', 'POST']}); // Укажите правильный путь к API
+                if (!response.ok) {
+                    throw new Error('Ошибка при получении данных: ' + response.status);
+                }
+                const data = await response.json();
+
+                // Предполагается, что data — массив объектов с dt_txt и main.temp
+                const labels = data.map(item => item.dt_txt);
+                const temps = data.map(item => item.main.temp);
+
+                // Получение контекста канваса
+                const ctx = document.getElementById('myChart').getContext('2d');
+
+                // Создание графика
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Температура (°C)',
+                            data: temps,
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Дата и время'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Температура (°C)'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось загрузить данные или построить график.');
+            }
+        }
+
+        // Запускаем функцию при загрузке страницы
+        window.onload = fetchAndPlot;
+    </script>
+</body>
+</html>
