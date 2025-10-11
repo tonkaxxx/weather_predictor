@@ -1,0 +1,7 @@
+services:
+  weather_predictor:
+    image: tonkaxxx/weather_predictor:latest
+    container_name: weather_predictor
+    volumes:
+      - ./back/.env:/app/back/.env:w
+    network_mode: host

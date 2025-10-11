@@ -42,7 +42,7 @@ def get_weather():
     temperatures = [float(row[0]) for row in prediction]
     
     days = []
-    first_date = df.index.min()
+    first_date = int(df.index.min())
     for i in range(8):
         days.append(first_date + i)
 
