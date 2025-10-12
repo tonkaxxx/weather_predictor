@@ -38,11 +38,12 @@ def get_weather():
     ).round(1)
     df = pd.concat([df, ai_df]) # соед 2 дфа
     df = df.round({
-        'temperature': 1,
+        'temperature': 0,
         'humidity': 0, 
         'pressure': 0,
         'wind_speed': 1
     }).astype({
+        'temperature': int,
         'humidity': int,
         'pressure': int
     })
