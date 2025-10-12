@@ -25,6 +25,12 @@ def get_weather():
     df = from_data_to_dataframe(data)
     last_5_days = from_df_to_nlist(df)
     
+    if df.empty:
+        return render_template(
+            'error.html',
+            city=city
+        )
+
     prediction = predict_weather(model, last_5_days, scaler_x, scaler_y)
 
     # дата для таблицы
@@ -72,11 +78,6 @@ def get_weather():
             temperatures=temperatures,
             real_temperatures=real_temperatures,
             days=days
-        )
-    else:
-        return render_template(
-            'error.html',
-            city=city
         )
 
 if __name__ == "__main__":
