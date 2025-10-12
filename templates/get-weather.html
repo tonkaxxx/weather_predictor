@@ -7,16 +7,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>Погода в городе: {{ city }}</h1>
+        <h1 style="text-align: center;">Погода в городе: {{ city }}</h1>
         
         <div class="content-wrapper">
             <div class="chart-container">
-                <h2>график</h2>
                 <canvas id="weatherChart"></canvas>
             </div>
             
             <div class="table-container">
-                <h2>таблица</h2>
                 {{ html_table|safe }}
             </div>
         </div>
@@ -26,10 +24,10 @@
         <script>
             const real_temps = JSON.parse('{{ real_temperatures | tojson | safe }}');
             const ai_temps = JSON.parse('{{ temperatures | tojson | safe }}');
+            const days = JSON.parse('{{ days | tojson | safe }}');
 
-            const temps = [...real_temps, ...ai_temps];
-            // иде показывает ошибку, но ее нет. переменную мы подставляем в мейне
-            const days = {{ days }}; 
+            const all_temps = [...real_temps, ...ai_temps];
+            const split_index = all_temps.length - 3;
 
             new Chart(
                 document.getElementById('weatherChart'),
@@ -38,36 +36,52 @@
                     data: {
                         labels: days,
                         datasets: [{
-                            label: 'Температура (°C)',
-                            data: temps,
-                            borderColor: 'rgb(75, 192, 192)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            data: all_temps,
+                            borderColor: function(context) {
+                                const index = context.dataIndex;
+                                return index >= split_index ? 'rgb(174, 189, 225)' : 'rgb(98, 145, 255)';
+                            },
+                            segment: {
+                                borderColor: function(context) {
+                                    const index = context.p0DataIndex;
+                                    return index >= split_index ? 'rgb(174, 189, 225)' : 'rgb(98, 145, 255)';
+                                }
+                            },
                             borderWidth: 3,
                             tension: 0.2,
-                            fill: true
+                            fill: true,
+                            backgroundColor: 'rgba(136, 233, 243, 0.16)'
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
+                        color: '#ffffff',
                         plugins: {
                             legend: {
-                                display: true,
-                                position: 'top'
+                                display: false,
                             }
                         },
                         scales: {
                             y: {
                                 title: {
                                     display: true,
-                                    text: 'Температура (°C)'
+                                    text: 'Температура (°C)',
+                                    color: '#ffffff'
+                                },
+                                ticks: {
+                                    color: '#ffffff'
                                 },
                                 beginAtZero: false
                             },
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Дни прогноза'
+                                    text: 'Дни прогноза',
+                                    color: '#ffffff'
+                                },
+                                ticks: {
+                                    color: '#ffffff'
                                 }
                             }
                         }

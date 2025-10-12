@@ -11,7 +11,7 @@ body {
 
 
 .title {
-  font-size: 2.8em;
+  font-size: 3em;
   color: #66cccc;
   text-shadow: 0 0 5px rgba(102, 204, 204, 0.7);
   margin-bottom: 10px;
@@ -29,7 +29,7 @@ body {
 
 .forma {
   background: rgba(37, 55, 109, 0.4); 
-  padding: 40px;
+  padding: 30px;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   max-width: 500px;
@@ -41,7 +41,7 @@ body {
 label {
   display: block;
   font-size: 1.4em;
-  margin-bottom: 8px;
+  margin-bottom: 24px;
   color: #a0c4c7;
 }
 
@@ -60,19 +60,19 @@ input[type="text"] {
 
 
 input[type="text"]:focus {
-  border-color: #66cccc;
+  border-color: #2a97c2;
   box-shadow: 0 0 8px rgba(102, 204, 204, 0.5);
 }
 
 
 input[type="submit"] {
-  width: 90%;
+  width: 98%;
   padding: 15px;
   margin-top: 20px;
   font-size: 1.4em;
   border: none;
   border-radius: 8px;
-  background-color: #277676; 
+  background-color: #2a97c2; 
   color: #fff;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -81,7 +81,7 @@ input[type="submit"] {
 
 
 input[type="submit"]:hover {
-  background-color: #267777; 
+  background-color: #1b7497; 
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -101,7 +101,7 @@ input[type="submit"]:hover {
 }
 .table th, .table td { 
     padding: 8px; 
-    text-align: left; 
+    text-align: center; 
     border-bottom: 1px solid #ddd; 
 }
 .table th { 
@@ -119,15 +119,20 @@ input[type="submit"]:hover {
 }
 .chart-container {
     flex: 1;
-    min-width: 0; 
-    }
+    width: 800px;
+    height: 400px;
+    margin: 20px auto;
+}
 .table-container {
     flex: 1;
-    min-width: 0;
+    width: 800px;
+    height: 400px;
+    margin: 20px auto;
 }
 .back-link {
     margin-top: 20px;
     display: block;
+    color: #2C5AC3;
 }
 @media (max-width: 768px) {
     .content-wrapper {

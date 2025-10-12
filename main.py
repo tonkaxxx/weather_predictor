@@ -37,7 +37,22 @@ def get_weather():
         index=new_dates
     ).round(1)
     df = pd.concat([df, ai_df]) # соед 2 дфа
-    
+    df = df.round({
+        'temperature': 1,
+        'humidity': 0, 
+        'pressure': 0,
+        'wind_speed': 1
+    }).astype({
+        'humidity': int,
+        'pressure': int
+    })
+    df = df.rename(columns={
+        'temperature': 'Температура',
+        'humidity': 'Влажность', 
+        'pressure': 'Давление',
+        'wind_speed': 'Скорость ветра'
+    })
+        
     real_temperatures = [float(row[0]) for row in last_5_days]
     temperatures = [float(row[0]) for row in prediction]
     
