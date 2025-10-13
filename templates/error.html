@@ -3,14 +3,24 @@
 <head>
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
     <style>
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .label1 { text-align: center; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Ошибка</h2>
-        <p>Не удалось получить данные для города: {{ city }}</p>
-        <a href="{{ url_for('index') }}" style="color: #2C5AC3;">Назад к поиску</a>
+    <div class="forma">
+        <form id="cityForm" action="/" method="GET">
+            <div class="label1">
+                <label for="city">Ошибка</label>
+            </div>
+            <div class="label1">
+                <label for="city">Нет данных для города: {{ city }}</label>
+            </div>
+            <div class="form_input">
+                <div class="input3">
+                    <input type="submit" value="Назад к поиску">
+                </div>
+            </div>
+        </form>
     </div>
 </body>
 </html>

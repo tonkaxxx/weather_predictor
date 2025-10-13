@@ -5,7 +5,7 @@ import pandas as pd
 import joblib
 
 from dotenv import load_dotenv
-from datetime import datetime, timedelta, timezone
+import datetime
 from flask import Flask, request, render_template
 
 from back.back import get_season, get_data, from_df_to_nlist, from_data_to_dataframe
@@ -79,8 +79,19 @@ def get_weather():
     full_dates, full_temps = fill_data_gaps(dates_24h, display_times, temps_24h)
 
     if not df.empty:
+        df.index = [f"Сегодня", f"Завтра"] + list(df.index[2:])
+
+        current_month = datetime.datetime.now().month
+
+        new_index = [df.index[0], df.index[1]]
+        for i in range(2, len(df)):
+            new_index.append(f"{df.index[i]}.{current_month:02d}")
+
+        df.index = new_index
+
         html_table = df.to_html(classes='table table-striped', index=True, border=0)
-        
+        print(df)
+
         return render_template(
             'get-weather.html',
             city=city,

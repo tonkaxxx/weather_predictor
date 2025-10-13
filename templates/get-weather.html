@@ -4,6 +4,23 @@
     <title>Погода в {{ city }}</title>
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .back-button-form {
+            position: fixed;
+            /* bottom: 20px;
+            right: 20px; */
+            align-content: center;
+            z-index: 1000;
+        }
+        .back-button-form .input3 {
+            width: auto;
+        }
+        .back-button-form input[type="submit"] {
+            width: auto;
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -23,7 +40,15 @@
             </div>
         </div>
         
-        <a href="{{ url_for('index') }}" class="back-link">Назад к поиску</a>
+    <!-- <div class="forma"> -->
+    <form id="cityForm" action="/" method="GET" class="back-button-form">
+        <div class="form_input">
+            <div class="input3">
+                <input type="submit" value="Назад к поиску">
+            </div>
+        </div>
+    </form>
+    <!-- </div> -->
 
         <script>
             const real_temps = JSON.parse('{{ real_temperatures | tojson | safe }}');
