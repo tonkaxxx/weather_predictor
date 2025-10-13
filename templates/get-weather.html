@@ -6,10 +6,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .back-button-form {
-            position: fixed;
-            /* bottom: 20px;
-            right: 20px; */
-            align-content: center;
+            position: relative;
+            right: 15px;
+            align-content: right;
             z-index: 1000;
         }
         .back-button-form .input3 {
@@ -24,10 +23,35 @@
 </head>
 <body>
     <div class="container">
-        <h1 style="text-align: center;">Погода в городе: {{ city }}</h1>
+        <div class="head-content">
+            <h1 style="text-align: left; margin-left: 20px;">Погода в городе: {{ city }}</h1>
 
-        <div class="chart-container">
-            <canvas id="weatherChart_24h"></canvas>
+            <form id="cityForm" action="/" method="GET" class="back-button-form">
+                <div class="form_input">
+                    <div class="input3">
+                        <input type="submit" value="Назад к поиску">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="top-content">
+            <div class="chart-container">
+                <canvas id="weatherChart_24h"></canvas>
+            </div>
+
+            <div class="recommendation-boxes">
+                <div class="forma">
+                    <div class="label1">
+                        <label for="city">Нуу ээ там шапку надень</label>
+                    </div>
+                </div>
+                <div class="forma">
+                    <div class="label1">
+                        <label for="city">брат ветра нет брат</label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="content-wrapper">
@@ -39,16 +63,6 @@
                 {{ html_table|safe }}
             </div>
         </div>
-        
-    <!-- <div class="forma"> -->
-    <form id="cityForm" action="/" method="GET" class="back-button-form">
-        <div class="form_input">
-            <div class="input3">
-                <input type="submit" value="Назад к поиску">
-            </div>
-        </div>
-    </form>
-    <!-- </div> -->
 
         <script>
             const real_temps = JSON.parse('{{ real_temperatures | tojson | safe }}');
@@ -109,7 +123,7 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Дни прогноза',
+                                    text: 'Реальные данные                                                                    Данные от нейросети',
                                     color: '#ffffff'
                                 },
                                 ticks: {
@@ -170,7 +184,7 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Дни прогноза',
+                                    text: 'Часы прогноза',
                                     color: '#ffffff'
                                 },
                                 ticks: {

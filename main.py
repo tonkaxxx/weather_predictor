@@ -89,7 +89,7 @@ def get_weather():
 
         df.index = new_index
 
-        html_table = df.to_html(classes='table table-striped', index=True, border=0)
+        html_table = df.to_html(classes='table table-striped', index=True, border=1)
         print(df)
 
         return render_template(
