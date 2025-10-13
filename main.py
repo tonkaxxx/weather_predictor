@@ -10,6 +10,7 @@ from flask import Flask, request, render_template
 
 from back.back import get_season, get_data, from_df_to_nlist, from_data_to_dataframe
 from back.predictor import predict_weather, load_trained_model
+from back.forecast_24h import get_24h_forecast, extract_dates_temps, fill_data_gaps
 
 app = Flask(__name__)
 
@@ -68,6 +69,10 @@ def get_weather():
     for i in range(8):
         days.append(first_date + i)
 
+    forecast_24h = get_24h_forecast(data)
+    dates_24h, display_times, temps_24h = extract_dates_temps(forecast_24h)
+    full_dates, full_temps = fill_data_gaps(dates_24h, display_times, temps_24h)
+
     if not df.empty:
         html_table = df.to_html(classes='table table-striped', index=True, border=0)
         
@@ -77,7 +82,9 @@ def get_weather():
             html_table=html_table,
             temperatures=temperatures,
             real_temperatures=real_temperatures,
-            days=days
+            days=days,
+            full_dates=full_dates,
+            full_temps=full_temps
         )
 
 if __name__ == "__main__":

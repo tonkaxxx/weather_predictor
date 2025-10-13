@@ -8,7 +8,11 @@
 <body>
     <div class="container">
         <h1 style="text-align: center;">Погода в городе: {{ city }}</h1>
-        
+
+        <div class="chart-container">
+            <canvas id="weatherChart_24h"></canvas>
+        </div>
+
         <div class="content-wrapper">
             <div class="chart-container">
                 <canvas id="weatherChart"></canvas>
@@ -26,10 +30,13 @@
             const ai_temps = JSON.parse('{{ temperatures | tojson | safe }}');
             const days = JSON.parse('{{ days | tojson | safe }}');
 
+            const full_dates = JSON.parse('{{ full_dates | tojson | safe }}');
+            const full_temps = JSON.parse('{{ full_temps | tojson | safe }}');
+
             const all_temps = [...real_temps, ...ai_temps];
             const split_index = all_temps.length - 3;
-
-            new Chart(
+            
+            new Chart( // 8 дней
                 document.getElementById('weatherChart'),
                 {
                     type: 'line',
@@ -88,6 +95,68 @@
                     }
                 }
             );
+
+
+            new Chart( // суточный
+                document.getElementById('weatherChart_24h'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: full_dates,
+                        datasets: [{
+                            data: full_temps,
+                            borderColor: function(context) {
+                                const index = context.dataIndex;
+                                return index >= split_index ? 'rgb(98, 145, 255)' : 'rgb(98, 145, 255)';
+                            },
+                            segment: {
+                                borderColor: function(context) {
+                                    const index = context.p0DataIndex;
+                                    return index >= split_index ? 'rgb(98, 145, 255)' : 'rgb(98, 145, 255)';
+                                }
+                            },
+                            borderWidth: 3,
+                            tension: 0.2,
+                            fill: true,
+                            backgroundColor: 'rgba(136, 233, 243, 0.16)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        color: '#ffffff',
+                        plugins: {
+                            legend: {
+                                display: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Температура (°C)',
+                                    color: '#ffffff'
+                                },
+                                ticks: {
+                                    color: '#ffffff'
+                                },
+                                beginAtZero: false
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Дни прогноза',
+                                    color: '#ffffff'
+                                },
+                                ticks: {
+                                    color: '#ffffff'
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
         </script>
     </div>
 </body>
