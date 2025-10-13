@@ -22,6 +22,11 @@ def index():
 def get_weather():
     # получаем данные для нейронки и для таблицы
     city = request.form.get('city')
+    if city.isdigit(): # почему-то при 4ех или 5ти значных числах апи выдает города... 
+        return render_template(
+            'error.html',
+            city=city
+        )
     data = get_data(city)
     df = from_data_to_dataframe(data)
     last_5_days = from_df_to_nlist(df)
