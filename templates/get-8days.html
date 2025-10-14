@@ -7,14 +7,21 @@
     <style>
         .back-button-form {
             position: relative;
-            right: 1px;
+            right: 3px;
             align-content: right;
             z-index: 1000;
         }
-        .back-button-form .input3 {
+        .h-d-button-form {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 3px;
+        }
+        .back-button-form .input3,
+        .h-d-button-form .input3 {
             width: auto;
         }
-        .back-button-form input[type="submit"] {
+        .back-button-form input[type="submit"],
+        .h-d-button-form input[type="submit"] {
             width: auto;
             padding: 10px 20px;
             font-size: 1em;
@@ -56,7 +63,7 @@
         </div>
 
         <div>
-            <form id="cityForm" action="/get-24hrs" method="POST" class="back-button-form">
+            <form id="cityForm" action="/get-24hrs" method="POST" class="h-d-button-form">
                 <input type="hidden" name="city" value="{{ city }}">
                 <div class="form_input">
                     <div class="input3">

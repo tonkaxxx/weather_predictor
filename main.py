@@ -122,6 +122,12 @@ def get_24hrs():
         'pressure': pressure_24h,
         'wind_speed': wind_speed_24h
     }, index=hours_mins)
+    df24 = df24.rename(columns={
+        'temperature': 'Температура',
+        'humidity': 'Влажность', 
+        'pressure': 'Давление',
+        'wind_speed': 'Скорость ветра'
+    })
 
     df = from_data_to_dataframe(data)
     last_5_days = from_df_to_nlist(df)
@@ -142,7 +148,6 @@ def get_24hrs():
 
     today_wind_speed = int(sum(full_wind_speed) / len(full_wind_speed))
     w_recomendation = ""
-    print(today_wind_speed)
     if today_wind_speed > 10:
         w_recomendation = "Ветер такой сильный, что даже голуби пешком ходят!"
     elif today_wind_speed > 3 and today_wind_speed <= 10:

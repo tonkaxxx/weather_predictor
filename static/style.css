@@ -165,3 +165,18 @@ input[type="submit"]:hover {
   flex: 1;
   height: 300px;
 }
+
+.h-d-button-form {
+    position: static;
+    right: 3px;
+    align-content: center;
+    z-index: 1000;
+}
+.h-d-button-form .input3 {
+    width: auto;
+}
+.h-d-button-form input[type="submit"] {
+    width: auto;
+    padding: 10px 20px;
+    font-size: 1em;
+}
