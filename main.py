@@ -109,6 +109,12 @@ def get_24hrs():
         )
     data = get_data(city)
 
+    if not data:
+        return render_template(
+            'error.html',
+            city=city
+        )
+
     forecast_24h = get_24h_forecast(data)
     dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h = extract_all_data(forecast_24h)
     full_dates, full_temps, full_humidity, full_pressure, full_wind_speed = fill_all_data_gaps(dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h)
