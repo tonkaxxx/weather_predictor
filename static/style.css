@@ -167,16 +167,62 @@ input[type="submit"]:hover {
 }
 
 .h-d-button-form {
-    position: static;
-    right: 3px;
-    align-content: center;
-    z-index: 1000;
+  position: static;
+  right: 3px;
+  align-content: center;
+  z-index: 1000;
+  width: 100%;
 }
 .h-d-button-form .input3 {
-    width: auto;
+  width: 100%;
 }
 .h-d-button-form input[type="submit"] {
-    width: auto;
-    padding: 10px 20px;
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 1em;
+}
+
+.current-temp-box {
+    background: rgba(136, 233, 243, 0.15);
+    border: 2px solid rgba(98, 145, 255, 0.5);
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.current-temp-box span {
     font-size: 1em;
+    color: #88e9f3;
+}
+
+.popular-button-form {
+    margin: 0px;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    flex: 1;
+    display: flex;
+}
+
+.popular-button-form input[type="submit"] {
+    width: 100%;
+    padding: 20px;
+    font-size: 1.1em;
+    border: 2px solid rgb(98, 145, 255);
+    border-radius: 8px;
+    background-color: rgba(136, 233, 243, 0.15);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    font-weight: bold;
+    flex: 1;
+}
+
+.popular-button-form input[type="submit"]:hover {
+    background-color: rgba(98, 145, 255, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }

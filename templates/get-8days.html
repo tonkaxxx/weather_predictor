@@ -36,6 +36,16 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
         }
+        .content-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: normal;
+        flex-direction: column;
+        gap: 0;
+        }
+        .current-temp-box {
+        padding: 15px;
+        }
     </style>
 </head>
 <body>
@@ -51,7 +61,7 @@
                 </div>
             </form>
         </div>
-
+    <div class="top-content">
         <div class="content-wrapper">
             <div class="chart-container">
                 <canvas id="weatherChart"></canvas>
@@ -61,6 +71,37 @@
                 {{ html_table|safe }}
             </div>
         </div>
+        <div class="content-wrapper">
+            <form id="cityForm" action="/get-24hrs" method="POST" class="popular-button-form">
+                <input type="hidden" name="city" value="Москва">
+                <input type="submit" value="Погода в Москве">
+            </form>
+            <form id="cityForm" action="/get-24hrs" method="POST" class="popular-button-form">
+                <input type="hidden" name="city" value="Санкт-петербург">
+                <input type="submit" value="Погода в Санкт-петербурге">
+            </form>
+            <form id="cityForm" action="/get-24hrs" method="POST" class="popular-button-form">
+                <input type="hidden" name="city" value="Новосибирск">
+                <input type="submit" value="Погода в Новосибирске">
+            </form>
+            <form id="cityForm" action="/get-24hrs" method="POST" class="popular-button-form">
+                <input type="hidden" name="city" value="Екатеринбург">
+                <input type="submit" value="Погода в Екатеринбурге">
+            </form>
+            <form id="cityForm" action="/get-24hrs" method="POST" class="popular-button-form">
+                <input type="hidden" name="city" value="Казань">
+                <input type="submit" value="Погода в Казани">
+            </form>
+            <form id="cityForm" action="/get-24hrs" method="POST" class="popular-button-form">
+                <input type="hidden" name="city" value="Уфа">
+                <input type="submit" value="Погода в Уфе">
+            </form>
+            <form id="cityForm" action="/get-24hrs" method="POST" class="popular-button-form">
+                <input type="hidden" name="city" value="Челябинск">
+                <input type="submit" value="Погода в Челябинске">
+            </form>
+        </div>
+    </div>
 
         <div>
             <form id="cityForm" action="/get-24hrs" method="POST" class="h-d-button-form">
