@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Погода в {{ city }}</title>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .back-button-form {
+            position: relative;
+            right: 15px;
+            align-content: right;
+            z-index: 1000;
+        }
+        .back-button-form .input3 {
+            width: auto;
+        }
+        .back-button-form input[type="submit"] {
+            width: auto;
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+        .forma {
+            background: rgba(37, 55, 109, 0.4); 
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="head-content">
+            <h1 style="text-align: left; margin-left: 20px;">Погода в городе: {{ city }}</h1>
+
+            <form id="cityForm" action="/" method="GET" class="back-button-form">
+                <div class="form_input">
+                    <div class="input3">
+                        <input type="submit" value="Назад к поиску">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="chart-container">
+                <canvas id="weatherChart"></canvas>
+            </div>
+            
+            <div class="table-container">
+                {{ html_table|safe }}
+            </div>
+        </div>
+
+        <div>
+            <form id="cityForm" action="/get-24hrs" method="POST" class="back-button-form">
+                <input type="hidden" name="city" value="{{ city }}">
+                <div class="form_input">
+                    <div class="input3">
+                        <input type="submit" value="Посмотреть погоду на день">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            const real_temps = JSON.parse('{{ real_temperatures | tojson | safe }}');
+            const ai_temps = JSON.parse('{{ temperatures | tojson | safe }}');
+            const days = JSON.parse('{{ days | tojson | safe }}');
+
+            const all_temps = [...real_temps, ...ai_temps];
+            const split_index = all_temps.length - 3;
+            
+            new Chart( // 8 дней
+                document.getElementById('weatherChart'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: days,
+                        datasets: [{
+                            data: all_temps,
+                            borderColor: function(context) {
+                                const index = context.dataIndex;
+                                return index >= split_index ? 'rgb(174, 189, 225)' : 'rgb(98, 145, 255)';
+                            },
+                            segment: {
+                                borderColor: function(context) {
+                                    const index = context.p0DataIndex;
+                                    return index >= split_index ? 'rgb(174, 189, 225)' : 'rgb(98, 145, 255)';
+                                }
+                            },
+                            borderWidth: 3,
+                            tension: 0.2,
+                            fill: true,
+                            backgroundColor: 'rgba(136, 233, 243, 0.16)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        color: '#ffffff',
+                        plugins: {
+                            legend: {
+                                display: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Температура (°C)',
+                                    color: '#ffffff'
+                                },
+                                ticks: {
+                                    color: '#ffffff'
+                                },
+                                beginAtZero: false
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Реальные данные                                                                    Данные от нейросети',
+                                    color: '#ffffff'
+                                },
+                                ticks: {
+                                    color: '#ffffff'
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
+        </script>
+    </div>
+</body>
+</html>

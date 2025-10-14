@@ -64,88 +64,20 @@
             </div>
         </div>
 
-        <div class="content-wrapper">
-            <div class="chart-container">
-                <canvas id="weatherChart"></canvas>
-            </div>
-            
-            <div class="table-container">
-                {{ html_table|safe }}
-            </div>
+        <div>
+            <form id="cityForm" action="/get-8days" method="POST" class="back-button-form">
+                <input type="hidden" name="city" value="{{ city }}">
+                <div class="form_input">
+                    <div class="input3">
+                        <input type="submit" value="Посмотреть погоду на неделю">
+                    </div>
+                </div>
+            </form>
         </div>
 
         <script>
-            const real_temps = JSON.parse('{{ real_temperatures | tojson | safe }}');
-            const ai_temps = JSON.parse('{{ temperatures | tojson | safe }}');
-            const days = JSON.parse('{{ days | tojson | safe }}');
-
             const full_dates = JSON.parse('{{ full_dates | tojson | safe }}');
-            console.log(full_dates)
             const full_temps = JSON.parse('{{ full_temps | tojson | safe }}');
-
-            const all_temps = [...real_temps, ...ai_temps];
-            const split_index = all_temps.length - 3;
-            
-            new Chart( // 8 дней
-                document.getElementById('weatherChart'),
-                {
-                    type: 'line',
-                    data: {
-                        labels: days,
-                        datasets: [{
-                            data: all_temps,
-                            borderColor: function(context) {
-                                const index = context.dataIndex;
-                                return index >= split_index ? 'rgb(174, 189, 225)' : 'rgb(98, 145, 255)';
-                            },
-                            segment: {
-                                borderColor: function(context) {
-                                    const index = context.p0DataIndex;
-                                    return index >= split_index ? 'rgb(174, 189, 225)' : 'rgb(98, 145, 255)';
-                                }
-                            },
-                            borderWidth: 3,
-                            tension: 0.2,
-                            fill: true,
-                            backgroundColor: 'rgba(136, 233, 243, 0.16)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        color: '#ffffff',
-                        plugins: {
-                            legend: {
-                                display: false,
-                            }
-                        },
-                        scales: {
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Температура (°C)',
-                                    color: '#ffffff'
-                                },
-                                ticks: {
-                                    color: '#ffffff'
-                                },
-                                beginAtZero: false
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Реальные данные                                                                    Данные от нейросети',
-                                    color: '#ffffff'
-                                },
-                                ticks: {
-                                    color: '#ffffff'
-                                }
-                            }
-                        }
-                    }
-                }
-            );
-
 
             new Chart( // суточный
                 document.getElementById('weatherChart_24h'),
@@ -155,16 +87,7 @@
                         labels: full_dates,
                         datasets: [{
                             data: full_temps,
-                            borderColor: function(context) {
-                                const index = context.dataIndex;
-                                return index >= split_index ? 'rgb(98, 145, 255)' : 'rgb(98, 145, 255)';
-                            },
-                            segment: {
-                                borderColor: function(context) {
-                                    const index = context.p0DataIndex;
-                                    return index >= split_index ? 'rgb(98, 145, 255)' : 'rgb(98, 145, 255)';
-                                }
-                            },
+                            borderColor: 'rgb(98, 145, 255)',
                             borderWidth: 3,
                             tension: 0.2,
                             fill: true,
