@@ -164,6 +164,7 @@ def get_24hrs():
             city=city,
             full_dates=full_dates,
             full_temps=full_temps,
+            today_temp=today_temp,
             t_recomendation=t_recomendation,
             w_recomendation=w_recomendation,
             table=table

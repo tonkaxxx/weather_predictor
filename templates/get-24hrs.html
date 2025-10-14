@@ -36,6 +36,22 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
         }
+        .current-temp-box {
+            background: rgba(136, 233, 243, 0.15);
+            border: 2px solid rgba(98, 145, 255, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            /* margin-bottom: 12px; */
+        }
+        .current-temp-box span {
+            font-size: 3em;
+            color: #88e9f3;
+        }
     </style>
 </head>
 <body>
@@ -70,9 +86,14 @@
                 </div>
             </div>
         </div>
-
-        <div class="table-container">
-            {{ table|safe }}
+        <div class="content-wrapper">
+            <div class="table-container">
+                {{ table|safe }}
+            </div>
+            <div class="current-temp-box">
+                <h1>Сейчас:</h1>
+                <span>{{ today_temp }}°C</span>
+            </div>
         </div>
 
         <div>
@@ -110,9 +131,7 @@
                         maintainAspectRatio: true,
                         color: '#ffffff',
                         plugins: {
-                            legend: {
-                                display: false,
-                            }
+                            legend: { display: false }
                         },
                         scales: {
                             y: {
@@ -121,9 +140,7 @@
                                     text: 'Температура (°C)',
                                     color: '#ffffff'
                                 },
-                                ticks: {
-                                    color: '#ffffff'
-                                },
+                                ticks: { color: '#ffffff' },
                                 beginAtZero: false
                             },
                             x: {
@@ -132,15 +149,12 @@
                                     text: 'Часы прогноза',
                                     color: '#ffffff'
                                 },
-                                ticks: {
-                                    color: '#ffffff'
-                                }
+                                ticks: { color: '#ffffff' }
                             }
                         }
                     }
                 }
             );
-
         </script>
     </div>
 </body>
