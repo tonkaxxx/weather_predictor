@@ -92,7 +92,6 @@ def get_weather():
         t_recomendation = "Самое время пойти искупаться"
 
     today_wind_speed = int(sum(full_wind_speed) / len(full_wind_speed))
-    print(today_wind_speed)
     w_recomendation = ""
     if today_wind_speed > 10:
         w_recomendation = "На улице сильный ветер, не потеряй свою шляпу!"
