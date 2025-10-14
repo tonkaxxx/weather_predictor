@@ -113,6 +113,16 @@ def get_24hrs():
     dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h = extract_all_data(forecast_24h)
     full_dates, full_temps, full_humidity, full_pressure, full_wind_speed = fill_all_data_gaps(dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h)
 
+    time_series = pd.to_datetime(dates_24h).strftime('%H:%M')
+    hours_mins = time_series.tolist()
+
+    df24 = pd.DataFrame({
+        'temperature': temps_24h,
+        'humidity': humidity_24h,
+        'pressure': pressure_24h,
+        'wind_speed': wind_speed_24h
+    }, index=hours_mins)
+
     df = from_data_to_dataframe(data)
     last_5_days = from_df_to_nlist(df)
     real_temperatures = [float(row[0]) for row in last_5_days]
@@ -121,142 +131,37 @@ def get_24hrs():
     t_recomendation = ""
     if today_temp < -15:
         t_recomendation = "На улице можно нос отморозить!"
-    elif today_temp < -5 and today_temp > -15:
+    elif today_temp < -5 and today_temp >= -15:
         t_recomendation = "Самое время поиграть в снежки с друзьями!"
-    elif today_temp < 10 and today_temp > -5:
+    elif today_temp < 10 and today_temp >= -5:
         t_recomendation = "Лучше заварить горячий чай и устроиться с книгой у окна"
-    elif today_temp < 25 and today_temp > 10:
+    elif today_temp < 25 and today_temp >= 10:
         t_recomendation = "Идеальное время для прогулки на свежем воздухе"
     elif today_temp > 25:
-        t_recomendation = "Самое время пойти искупаться"
+        t_recomendation = "Самое время пойти искупаться!"
 
     today_wind_speed = int(sum(full_wind_speed) / len(full_wind_speed))
     w_recomendation = ""
+    print(today_wind_speed)
     if today_wind_speed > 10:
-        w_recomendation = "На улице сильный ветер, не потеряй свою шляпу!"
-    elif today_wind_speed > 5 and today_wind_speed < 10:
-        w_recomendation = "Не забудь ветровку, на улице ветрено"
-    elif today_wind_speed > 0 and today_wind_speed < 5:
+        w_recomendation = "Ветер такой сильный, что даже голуби пешком ходят!"
+    elif today_wind_speed > 3 and today_wind_speed <= 10:
+        w_recomendation = "Не потеряй свою шляпу!, на улице ветрено"
+    elif today_wind_speed > 1 and today_wind_speed <= 3:
+        w_recomendation = "Легкий ветерок создает прекрасную атмосферу для неспешной прогулки в парке"
+    elif today_wind_speed > 0 and today_wind_speed <= 1:
         w_recomendation = "Сегодня полный штиль, покататься на своей яхте не выйдет"
 
     if not df.empty:
-
+        table = df24.to_html(classes='table table-striped', index=True, border=1)
         return render_template(
             'get-24hrs.html',
             city=city,
             full_dates=full_dates,
             full_temps=full_temps,
             t_recomendation=t_recomendation,
-            w_recomendation=w_recomendation
-        )
-
-@app.route('/get-weather', methods=['POST'])
-def get_weather():
-    # получаем данные для нейронки и для таблицы
-    city = request.form.get('city')
-    if city.isdigit(): # почему-то при 4ех или 5ти значных числах апи выдает города... 
-        return render_template(
-            'error.html',
-            city=city
-        )
-    data = get_data(city)
-    df = from_data_to_dataframe(data)
-    last_5_days = from_df_to_nlist(df)
-    
-    if df.empty:
-        return render_template(
-            'error.html',
-            city=city
-        )
-
-    prediction = predict_weather(model, last_5_days, scaler_x, scaler_y)
-
-    # дата для таблицы
-    last_date = df.index.max()
-    new_dates = [last_date + 1, last_date + 2, last_date + 3]
-
-    ai_df = pd.DataFrame(
-        prediction, 
-        columns=['temperature', 'humidity', 'pressure', 'wind_speed'],
-        index=new_dates
-    ).round(1)
-    df = pd.concat([df, ai_df]) # соед 2 дфа
-    df = df.round({
-        'temperature': 0,
-        'humidity': 0, 
-        'pressure': 0,
-        'wind_speed': 1
-    }).astype({
-        'temperature': int,
-        'humidity': int,
-        'pressure': int
-    })
-    df = df.rename(columns={
-        'temperature': 'Температура',
-        'humidity': 'Влажность', 
-        'pressure': 'Давление',
-        'wind_speed': 'Скорость ветра'
-    })
-        
-    real_temperatures = [float(row[0]) for row in last_5_days]
-    temperatures = [float(row[0]) for row in prediction]
-    
-    days = []
-    first_date = int(df.index.min())
-    for i in range(8):
-        days.append(first_date + i)
-
-    forecast_24h = get_24h_forecast(data)
-    dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h = extract_all_data(forecast_24h)
-    full_dates, full_temps, full_humidity, full_pressure, full_wind_speed = fill_all_data_gaps(dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h)
-
-    today_temp = real_temperatures[0]
-    t_recomendation = ""
-    if today_temp < -15:
-        t_recomendation = "На улице можно нос отморозить!"
-    elif today_temp < -5 and today_temp > -15:
-        t_recomendation = "Самое время поиграть в снежки с друзьями!"
-    elif today_temp < 10 and today_temp > -5:
-        t_recomendation = "Лучше заварить горячий чай и устроиться с книгой у окна"
-    elif today_temp < 25 and today_temp > 10:
-        t_recomendation = "Идеальное время для прогулки на свежем воздухе"
-    elif today_temp > 25:
-        t_recomendation = "Самое время пойти искупаться"
-
-    today_wind_speed = int(sum(full_wind_speed) / len(full_wind_speed))
-    w_recomendation = ""
-    if today_wind_speed > 10:
-        w_recomendation = "На улице сильный ветер, не потеряй свою шляпу!"
-    elif today_wind_speed > 5 and today_wind_speed < 10:
-        w_recomendation = "Не забудь ветровку, на улице ветрено"
-    elif today_wind_speed > 0 and today_wind_speed < 5:
-        w_recomendation = "Сегодня полный штиль, покататься на своей яхте не выйдет"
-
-    if not df.empty:
-        df.index = [f"Сегодня", f"Завтра"] + list(df.index[2:])
-
-        current_month = datetime.datetime.now().month
-
-        new_index = [df.index[0], df.index[1]]
-        for i in range(2, len(df)):
-            new_index.append(f"{df.index[i]}.{current_month:02d}")
-
-        df.index = new_index
-
-        html_table = df.to_html(classes='table table-striped', index=True, border=1)
-        print(df)
-
-        return render_template(
-            'get-weather.html',
-            city=city,
-            html_table=html_table,
-            temperatures=temperatures,
-            real_temperatures=real_temperatures,
-            days=days,
-            full_dates=full_dates,
-            full_temps=full_temps,
-            t_recomendation=t_recomendation,
-            w_recomendation=w_recomendation
+            w_recomendation=w_recomendation,
+            table=table
         )
 
 if __name__ == "__main__":
@@ -264,4 +169,4 @@ if __name__ == "__main__":
     scaler_x = joblib.load('scaler_x.pkl')
     scaler_y = joblib.load('scaler_y.pkl')
 
-    app.run(host='0.0.0.0', port=5001, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=False)
