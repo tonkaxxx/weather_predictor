@@ -10,7 +10,7 @@ from flask import Flask, request, render_template
 
 from back.back import get_season, get_data, from_df_to_nlist, from_data_to_dataframe
 from back.predictor import predict_weather, load_trained_model
-from back.forecast_24h import get_24h_forecast, extract_dates_temps, fill_data_gaps
+from back.forecast_24h import get_24h_forecast, extract_all_data, fill_all_data_gaps
 
 app = Flask(__name__)
 
@@ -75,8 +75,31 @@ def get_weather():
         days.append(first_date + i)
 
     forecast_24h = get_24h_forecast(data)
-    dates_24h, display_times, temps_24h = extract_dates_temps(forecast_24h)
-    full_dates, full_temps = fill_data_gaps(dates_24h, display_times, temps_24h)
+    dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h = extract_all_data(forecast_24h)
+    full_dates, full_temps, full_humidity, full_pressure, full_wind_speed = fill_all_data_gaps(dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h)
+
+    today_temp = real_temperatures[0]
+    t_recomendation = ""
+    if today_temp < -15:
+        t_recomendation = "На улице можно нос отморозить!"
+    elif today_temp < -5 and today_temp > -15:
+        t_recomendation = "Самое время поиграть в снежки с друзьями!"
+    elif today_temp < 10 and today_temp > -5:
+        t_recomendation = "Лучше заварить горячий чай и устроиться с книгой у окна"
+    elif today_temp < 25 and today_temp > 10:
+        t_recomendation = "Идеальное время для прогулки на свежем воздухе"
+    elif today_temp > 25:
+        t_recomendation = "Самое время пойти искупаться"
+
+    today_wind_speed = int(sum(full_wind_speed) / len(full_wind_speed))
+    print(today_wind_speed)
+    w_recomendation = ""
+    if today_wind_speed > 10:
+        w_recomendation = "На улице сильный ветер, не потеряй свою шляпу!"
+    elif today_wind_speed > 5 and today_wind_speed < 10:
+        w_recomendation = "Не забудь ветровку, на улице ветрено"
+    elif today_wind_speed > 0 and today_wind_speed < 5:
+        w_recomendation = "Сегодня полный штиль, покататься на своей яхте не выйдет"
 
     if not df.empty:
         df.index = [f"Сегодня", f"Завтра"] + list(df.index[2:])
@@ -100,7 +123,9 @@ def get_weather():
             real_temperatures=real_temperatures,
             days=days,
             full_dates=full_dates,
-            full_temps=full_temps
+            full_temps=full_temps,
+            t_recomendation=t_recomendation,
+            w_recomendation=w_recomendation
         )
 
 if __name__ == "__main__":

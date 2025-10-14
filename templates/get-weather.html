@@ -19,6 +19,16 @@
             padding: 10px 20px;
             font-size: 1em;
         }
+        .forma {
+            background: rgba(37, 55, 109, 0.4); 
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -43,12 +53,12 @@
             <div class="recommendation-boxes">
                 <div class="forma">
                     <div class="label1">
-                        <label for="city">Нуу ээ там шапку надень</label>
+                        <label for="city">{{ t_recomendation }}</label>
                     </div>
                 </div>
                 <div class="forma">
                     <div class="label1">
-                        <label for="city">брат ветра нет брат</label>
+                        <label for="city">{{ w_recomendation }}</label>
                     </div>
                 </div>
             </div>
@@ -70,6 +80,7 @@
             const days = JSON.parse('{{ days | tojson | safe }}');
 
             const full_dates = JSON.parse('{{ full_dates | tojson | safe }}');
+            console.log(full_dates)
             const full_temps = JSON.parse('{{ full_temps | tojson | safe }}');
 
             const all_temps = [...real_temps, ...ai_temps];
