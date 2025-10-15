@@ -160,7 +160,7 @@ def get_24hrs():
         w_recomendation = "Не потеряй свою шляпу!, на улице ветрено"
     elif today_wind_speed > 1 and today_wind_speed <= 3:
         w_recomendation = "Легкий ветерок создает прекрасную атмосферу для неспешной прогулки в парке"
-    elif today_wind_speed > 0 and today_wind_speed <= 1:
+    elif today_wind_speed >= 0 and today_wind_speed <= 1:
         w_recomendation = "Сегодня полный штиль, покататься на своей яхте не выйдет"
 
     if not df.empty:

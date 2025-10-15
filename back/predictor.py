@@ -248,7 +248,7 @@ if __name__ == "__main__":
         
         if patience_counter >= patience:
             print(f'early stopping at epoch {epoch}')
-            break
+            # break
 
     model.load_state_dict(torch.load('best_model.pth'))
 
