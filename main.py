@@ -75,14 +75,32 @@ def get_8days():
         days.append(first_date + i)
 
     if not df.empty:
-        df.index = [f"Сегодня", f"Завтра"] + list(df.index[2:])
-
-        current_month = datetime.datetime.now().month
-
-        new_index = [df.index[0], df.index[1]]
-        for i in range(2, len(df)):
-            new_index.append(f"{df.index[i]}.{current_month:02d}")
-
+        days_ru = {
+            'Monday': 'Пн',
+            'Tuesday': 'Вт', 
+            'Wednesday': 'Ср',
+            'Thursday': 'Чт',
+            'Friday': 'Пт',
+            'Saturday': 'Сб',
+            'Sunday': 'Вс'
+        }
+        
+        current_date = datetime.datetime.now()
+        new_index = []
+        
+        for i in range(len(df)):
+            date = current_date + datetime.timedelta(days=i)
+            day_name_ru = days_ru[date.strftime('%A')]
+            day_number = date.day
+            month_number = date.month
+            
+            if i == 0:
+                new_index.append("Сегодня")
+            elif i == 1:
+                new_index.append("Завтра")
+            else:
+                new_index.append(f"{day_name_ru}, {day_number:02d}.{month_number:02d}")
+        
         df.index = new_index
 
         html_table = df.to_html(classes='table table-striped', index=True, border=1)
@@ -95,8 +113,6 @@ def get_8days():
             real_temperatures=real_temperatures,
             days=days,
         )
-    
-
 
 @app.route('/get-24hrs', methods=['POST'])
 def get_24hrs():

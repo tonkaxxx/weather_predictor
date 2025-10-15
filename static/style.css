@@ -197,25 +197,25 @@ input[type="submit"]:hover {
 }
 
 .current-temp-box {
-    background: rgba(52, 152, 219, 0.1);
-    border: 2px solid #3498db;
-    border-radius: 15px;
-    padding: 20px;
-    padding-top: 50px;
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
-    color: #2c3e50;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
+  background: rgba(52, 152, 219, 0.1);
+  border: 2px solid #3498db;
+  border-radius: 15px;
+  padding: 20px;
+  padding-top: 50px;
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  color: #2c3e50;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
 }
 .current-temp-box span {
-    font-size: 1em;
-    color: #3498db;
+  font-size: 1em;
+  color: #3498db;
 }
 
 .popular-button-form {
     margin: 0px;
-    padding: 0;
+    padding: 6px;
     background: none;
     border: none;
     box-shadow: none;
