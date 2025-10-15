@@ -92,14 +92,13 @@ def get_8days():
             date = current_date + datetime.timedelta(days=i)
             day_name_ru = days_ru[date.strftime('%A')]
             day_number = date.day
-            month_number = date.month
             
             if i == 0:
                 new_index.append("Сегодня")
             elif i == 1:
                 new_index.append("Завтра")
             else:
-                new_index.append(f"{day_name_ru}, {day_number:02d}.{month_number:02d}")
+                new_index.append(f"{day_name_ru}, {day_number:02d}")
         
         df.index = new_index
 
