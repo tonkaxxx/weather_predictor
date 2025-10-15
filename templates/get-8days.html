@@ -37,14 +37,17 @@
             text-align: center;
         }
         .content-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: normal;
-        flex-direction: column;
-        gap: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: normal;
+            flex-direction: column;
+            gap: 0;
         }
         .current-temp-box {
-        padding: 15px;
+            padding: 15px;
+        }
+        .table-container {
+            width: 97%;
         }
     </style>
 </head>
@@ -149,7 +152,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
-                        color: '#ffffff',
+                        color: '#000000',
                         plugins: {
                             legend: {
                                 display: false,
@@ -160,10 +163,10 @@
                                 title: {
                                     display: true,
                                     text: 'Температура (°C)',
-                                    color: '#ffffff'
+                                    color: '#000000'
                                 },
                                 ticks: {
-                                    color: '#ffffff'
+                                    color: '#000000'
                                 },
                                 beginAtZero: false
                             },
@@ -171,10 +174,10 @@
                                 title: {
                                     display: true,
                                     text: 'Реальные данные                                                                    Данные от нейросети',
-                                    color: '#ffffff'
+                                    color: '#000000'
                                 },
                                 ticks: {
-                                    color: '#ffffff'
+                                    color: '#000000'
                                 }
                             }
                         }

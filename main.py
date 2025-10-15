@@ -86,7 +86,6 @@ def get_8days():
         df.index = new_index
 
         html_table = df.to_html(classes='table table-striped', index=True, border=1)
-        print(df)
 
         return render_template(
             'get-8days.html',

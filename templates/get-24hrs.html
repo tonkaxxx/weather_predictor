@@ -27,7 +27,7 @@
             font-size: 1em;
         }
         .forma {
-            background: rgba(37, 55, 109, 0.4); 
+            background: rgb(234, 245, 251);
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -35,6 +35,9 @@
             width: 92%;
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
+        }
+        label {
+            background-color: rgb(234, 245, 251);
         }
     </style>
 </head>
@@ -113,7 +116,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
-                        color: '#ffffff',
+                        color: '#000000',
                         plugins: {
                             legend: { display: false }
                         },
@@ -122,18 +125,18 @@
                                 title: {
                                     display: true,
                                     text: 'Температура (°C)',
-                                    color: '#ffffff'
+                                    color: '#000000'
                                 },
-                                ticks: { color: '#ffffff' },
+                                ticks: { color: '#000000' },
                                 beginAtZero: false
                             },
                             x: {
                                 title: {
                                     display: true,
                                     text: 'Часы прогноза',
-                                    color: '#ffffff'
+                                    color: '#000000'
                                 },
-                                ticks: { color: '#ffffff' }
+                                ticks: { color: '#000000' }
                             }
                         }
                     }
