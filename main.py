@@ -43,6 +43,9 @@ def get_8days():
     last_date = df.index.max()
     new_dates = [last_date + 1, last_date + 2, last_date + 3]
 
+    print(last_5_days)
+    print(prediction)
+
     ai_df = pd.DataFrame(
         prediction, 
         columns=['temperature', 'humidity', 'pressure', 'wind_speed'],
