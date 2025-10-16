@@ -4,9 +4,19 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link href="../static/style.css" rel="stylesheet"/>
+    <style>
+        label {
+        font-size: 1.8em;
+        color: #3498db;
+        }
+    </style>
 </head>
 <body>
 <header class="header-container">
+    <div class="logo-container">
+        <img src="../static/logo_nobg_darker.png" alt="Логотип" class="logo">
+    </div>
+
     <div class="forma">
         <form id="cityForm" action="/get-24hrs" method="POST">
             <div class="form_input">
