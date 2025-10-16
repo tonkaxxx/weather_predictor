@@ -60,10 +60,10 @@ def get_8days():
         'pressure': int
     })
     df = df.rename(columns={
-        'temperature': 'Температура',
-        'humidity': 'Влажность', 
-        'pressure': 'Давление',
-        'wind_speed': 'Скорость ветра'
+        'temperature': 'Температура, °C',
+        'humidity': 'Влажность, %', 
+        'pressure': 'Давление, гПа',
+        'wind_speed': 'Скорость ветра, м/с'
     })
         
     real_temperatures = [float(row[0]) for row in last_5_days]
@@ -143,10 +143,10 @@ def get_24hrs():
         'wind_speed': wind_speed_24h
     }, index=hours_mins)
     df24 = df24.rename(columns={
-        'temperature': 'Температура',
-        'humidity': 'Влажность', 
-        'pressure': 'Давление',
-        'wind_speed': 'Скорость ветра'
+        'temperature': 'Температура, °C',
+        'humidity': 'Влажность, %', 
+        'pressure': 'Давление, гПа',
+        'wind_speed': 'Скорость ветра, м/с'
     })
 
     df = from_data_to_dataframe(data)
@@ -171,7 +171,7 @@ def get_24hrs():
     if today_wind_speed > 10:
         w_recomendation = "Ветер такой сильный, что даже голуби пешком ходят!"
     elif today_wind_speed > 3 and today_wind_speed <= 10:
-        w_recomendation = "Не потеряй свою шляпу!, на улице ветрено"
+        w_recomendation = "Не потеряй свою шляпу, на улице ветрено"
     elif today_wind_speed > 1 and today_wind_speed <= 3:
         w_recomendation = "Легкий ветерок создает прекрасную атмосферу для неспешной прогулки в парке"
     elif today_wind_speed >= 0 and today_wind_speed <= 1:
