@@ -6,7 +6,7 @@ import joblib
 
 from dotenv import load_dotenv
 import datetime
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 
 from back.back import get_season, get_data, from_df_to_nlist, from_data_to_dataframe
 from back.predictor import predict_weather, load_trained_model
@@ -192,6 +192,56 @@ def get_24hrs():
             w_recomendation=w_recomendation,
             table=table
         )
+
+@app.route('/api/get-24hrs', methods=['POST'])
+def api_get_24hrs():
+    try:
+        data = request.get_json()
+        city = data.get('city', '')
+        
+        if city.isdigit(): # почему-то при 4ех или 5ти значных числах апи выдает города... 
+            return render_template(
+                'error.html',
+                city=city
+            )
+        data = get_data(city)
+
+        if not data:
+            return render_template(
+                'error.html',
+                city=city
+            )
+
+        forecast_24h = get_24h_forecast(data)
+        dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h = extract_all_data(forecast_24h)
+
+        time_series = pd.to_datetime(dates_24h).strftime('%H:%M')
+        hours_mins = time_series.tolist()
+
+        df24 = pd.DataFrame({
+            'temperature': temps_24h,
+            'humidity': humidity_24h,
+            'pressure': pressure_24h,
+            'wind_speed': wind_speed_24h
+        }, index=hours_mins)
+        df24 = df24.rename(columns={
+            'temperature': 'Температура, °C',
+            'humidity': 'Влажность, %', 
+            'pressure': 'Давление, гПа',
+            'wind_speed': 'Скорость ветра, м/с'
+        })
+
+        df = from_data_to_dataframe(data)
+        return jsonify({
+            'status': 'success',
+            'response': str(df)
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 if __name__ == "__main__":
     model = load_trained_model('weather_model.pth')
