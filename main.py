@@ -199,42 +199,24 @@ def api_get_24hrs():
         data = request.get_json()
         city = data.get('city', '')
         
-        if city.isdigit(): # почему-то при 4ех или 5ти значных числах апи выдает города... 
-            return render_template(
-                'error.html',
-                city=city
-            )
         data = get_data(city)
-
-        if not data:
-            return render_template(
-                'error.html',
-                city=city
-            )
 
         forecast_24h = get_24h_forecast(data)
         dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h = extract_all_data(forecast_24h)
+        full_dates, full_temps, full_humidity, full_pressure, full_wind_speed = fill_all_data_gaps(
+            dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h
+        )
 
-        time_series = pd.to_datetime(dates_24h).strftime('%H:%M')
-        hours_mins = time_series.tolist()
-
-        df24 = pd.DataFrame({
-            'temperature': temps_24h,
-            'humidity': humidity_24h,
-            'pressure': pressure_24h,
-            'wind_speed': wind_speed_24h
-        }, index=hours_mins)
-        df24 = df24.rename(columns={
-            'temperature': 'Температура, °C',
-            'humidity': 'Влажность, %', 
-            'pressure': 'Давление, гПа',
-            'wind_speed': 'Скорость ветра, м/с'
-        })
-
-        df = from_data_to_dataframe(data)
+        weather_info_for_ai = f"""
+        time: {full_dates}
+        temperature: {full_temps}
+        humidity: {full_humidity}
+        pressure: {full_pressure}
+        wind speed: {full_wind_speed}
+        """
+        
         return jsonify({
-            'status': 'success',
-            'response': str(df)
+            'response': str(weather_info_for_ai)
         })
     
     except Exception as e:
