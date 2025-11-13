@@ -207,6 +207,16 @@ def api_get_24hrs():
             dates_24h, display_times, temps_24h, humidity_24h, pressure_24h, wind_speed_24h
         )
 
+        time_series = pd.to_datetime(dates_24h).strftime('%H:%M')
+        hours_mins = time_series.tolist()
+
+        df24 = pd.DataFrame({
+            'temperature': temps_24h,
+            'humidity': humidity_24h,
+            'pressure': pressure_24h,
+            'wind_speed': wind_speed_24h
+        }, index=hours_mins)
+
         weather_info_for_ai = f"""
         time: {full_dates}
         temperature: {full_temps}
@@ -216,8 +226,95 @@ def api_get_24hrs():
         """
         
         return jsonify({
-            'response': str(weather_info_for_ai)
+            'status': 'success',
+            'for_ai': weather_info_for_ai,
+            'dataframe': df24.to_dict()
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/api/get-8days', methods=['POST'])
+def api_get_8days():
+    try:
+        data = request.get_json()
+        city = data.get('city', '')
+        
+        data = get_data(city)
+        df = from_data_to_dataframe(data)
+        last_5_days = from_df_to_nlist(df)
+        
+        if df.empty:
+            return render_template(
+                'error.html',
+                city=city
+            )
+
+        prediction = predict_weather(model, last_5_days, scaler_x, scaler_y)
+
+        # дата для таблицы
+        last_date = df.index.max()
+        new_dates = [last_date + 1, last_date + 2, last_date + 3]
+
+        ai_df = pd.DataFrame(
+            prediction, 
+            columns=['temperature', 'humidity', 'pressure', 'wind_speed'],
+            index=new_dates
+        ).round(1)
+        df = pd.concat([df, ai_df]) # соед 2 дфа
+        df = df.round({
+            'temperature': 0,
+            'humidity': 0, 
+            'pressure': 0,
+            'wind_speed': 1
+        }).astype({
+            'temperature': int,
+            'humidity': int,
+            'pressure': int
         })
+            
+        days = []
+        first_date = int(df.index.min())
+        for i in range(8):
+            days.append(first_date + i)
+
+        if not df.empty:
+            days_ru = {
+                'Monday': 'Mn',
+                'Tuesday': 'Tu', 
+                'Wednesday': 'We',
+                'Thursday': 'Th',
+                'Friday': 'Fr',
+                'Saturday': 'Sa',
+                'Sunday': 'Su'
+            }
+            
+            current_date = datetime.datetime.now()
+            new_index = []
+            
+            for i in range(len(df)):
+                date = current_date + datetime.timedelta(days=i)
+                day_name_ru = days_ru[date.strftime('%A')]
+                day_number = date.day
+                
+                if i == 0:
+                    new_index.append("Today")
+                elif i == 1:
+                    new_index.append("Tomorrow")
+                else:
+                    new_index.append(f"{day_name_ru}, {day_number:02d}")
+            
+            df.index = new_index
+            print(df)
+
+        return jsonify({
+            'status': 'success',
+            'prediction': df.to_dict()
+        }), 200
+
     
     except Exception as e:
         return jsonify({
@@ -226,6 +323,7 @@ def api_get_24hrs():
         }), 500
 
 if __name__ == "__main__":
+
     model = load_trained_model('weather_model.pth')
     scaler_x = joblib.load('scaler_x.pkl')
     scaler_y = joblib.load('scaler_y.pkl')
