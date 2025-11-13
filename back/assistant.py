@@ -1,8 +1,10 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import requests
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 url = "http://192.168.88.17:5000/api/get-24hrs"
 model_name = "Qwen/Qwen3-4B-Instruct-2507"
@@ -65,6 +67,11 @@ def api_ask_ai():
         data = request.get_json()
         city = data.get('city', '')
         user_input = data.get('user_input', '')
+        if user_input == "test123":
+            return jsonify({
+                'status': 'success',
+                'response': "На сегодня температура постепенно растёт с утра до дня, достигая максимума около 6,93 градусов в 12:00, затем немного снижается. Влажность стабильно повышается с утра до вечернего времени, достигая 77% к вечеру. Ветер умеренный, скорость варьируется от 5,95 до 8,16 м/с. Влажность не превышает 77%, поэтому дождя нет. На сегодня рекомендуется надеть теплую одежду — плед, свитер или кофту — из-за низкой температуры в вечернее время. В дневное время можно использовать легкую одежду, но при этом не забывать о тепле. Ветер может быть ощутимым, особенно в вечерние часы, поэтому можно взять пальто или куртку."
+            }), 200
 
         response = ask_ai(user_input, city)
         

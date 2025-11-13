@@ -143,25 +143,62 @@
                 }
             );
         </script>
+
+        <div class="ai_ask_widget">
+            <form class="ask-form" id="aiForm">
+                <div class="input_ai">
+                    <input type="text" id="aiQuestion" autocomplete="off" placeholder="Задай вопрос нейросети" aria-label="Введите вопрос" required/>
+                </div>
+                <div class="button_ai">
+                    <input type="submit" value="Отправить">
+                </div>
+            </form>
+        </div>
+        <div id="aiResponse" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px; display: none;"></div>
     </div>
 
-    <div class="ai_ask_widget">
-        <form class="ask-form" id="aiForm">
-            <div class="input_ai">
-                <input
-                        type="text"
-                        autocomplete="off"
-                        placeholder="Задай вопрос нейросети"
-                        aria-label="Введите вопрос"
-                        required
-                />
-            </div>
-            <div class="button_ai">
-                <input type="submit" value="Отправить">
-            </div>
-        </form>
-    </div>
-
+    <script>
+        document.getElementById('aiForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const user_input = document.getElementById('aiQuestion').value;
+            const responseDiv = document.getElementById('aiResponse');
+            
+            if (!user_input.trim()) return;
+            
+            responseDiv.style.display = 'block';
+            responseDiv.style.maxWidth = '1110px';
+            responseDiv.style.margin = '10px auto';
+            responseDiv.innerHTML = 'Отправка запроса...';
+            
+            fetch('http://192.168.88.33:5050/api/ask-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_input: user_input,
+                    city: '{{ city }}'
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Full response data:', data);
+                
+                const answer = data.answer || data.response || data.message || data.text || JSON.stringify(data);
+                responseDiv.innerHTML = `<strong>Ответ:</strong> ${answer}`;
+                document.getElementById('aiQuestion').value = '';
+            })
+            .catch(error => {
+                console.error('Full error:', error);
+                responseDiv.innerHTML = '<strong>Ошибка:</strong> Не удалось получить ответ';
+            });
+        });
+    </script>
 
 </body>
 </html>
