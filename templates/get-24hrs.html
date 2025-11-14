@@ -171,7 +171,7 @@
             responseDiv.style.margin = '10px auto';
             responseDiv.innerHTML = 'Отправка запроса...';
             
-            fetch('http://192.168.88.33:5050/api/ask-ai', {
+            fetch('/api/ask-ai', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

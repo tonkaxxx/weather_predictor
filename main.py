@@ -321,6 +321,17 @@ def api_get_8days():
             'status': 'error',
             'message': str(e)
         }), 500
+    
+@app.route('/api/ask-ai', methods=['POST']) # жс интерпритируется сразу в браузере, поэтому внутренний айпи не резолвится. делаю такую прослойку щас
+def ask_ai():
+    data = request.get_json()
+
+    r = requests.post(
+        "http://192.168.88.33:5050/api/ask-ai",
+        json=data,
+    )
+
+    return jsonify(r.json())
 
 if __name__ == "__main__":
 
