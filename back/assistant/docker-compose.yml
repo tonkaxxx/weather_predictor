@@ -1,0 +1,6 @@
+services:
+  weather-predictor:
+    image: tonkaxxx/weather_predictor_assistant:latest
+    ports:
+      - "5050:5050"
+    restart: unless-stopped

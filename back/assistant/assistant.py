@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 url = "http://192.168.88.17:5000/api/get-24hrs"
-model_name = "Qwen/Qwen3-4B-Instruct-2507"
+model_name = "Qwen/Qwen3-4B"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
