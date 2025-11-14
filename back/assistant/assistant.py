@@ -2,18 +2,25 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import torch
 
 app = Flask(__name__)
 CORS(app)
 
 url = "http://192.168.88.17:5000/api/get-24hrs"
-model_name = "Qwen/Qwen3-4B-Instruct-2507"
+model_name = "Qwen/Qwen3-1.7B"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
-    dtype="auto",
-    device_map="auto"
+    dtype=torch.float16,
+    device_map="auto",
+    trust_remote_code=True,
+    cache_dir="./model_cache" 
 )
+
+# компилим модель для ускорения
+if hasattr(torch, 'compile'):
+    model = torch.compile(model)
 
 def ask_ai(user_input, city):
     response = requests.post(url, json={"city": city})
@@ -41,25 +48,30 @@ def ask_ai(user_input, city):
         messages,
         tokenize=False,
         add_generation_prompt=True,
-        # enable_thinking=True
+        enable_thinking=False
     )
 
-    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
-    generated_ids = model.generate(
-        **model_inputs,
-        max_new_tokens=512
-    )
+    model_inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    
+    with torch.no_grad():
+        generated_ids = model.generate(
+            **model_inputs,
+            max_new_tokens=128,
+            do_sample=False,
+            temperature=0.1,
+            top_p=0.9,
+            pad_token_id=tokenizer.eos_token_id,
+            repetition_penalty=1.1,
+            num_return_sequences=1,
+            early_stopping=True
+        )
 
-    output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
+    response_text = tokenizer.decode(
+        generated_ids[0][len(model_inputs.input_ids[0]):], 
+        skip_special_tokens=True
+    ).strip()
 
-    try:
-        index = len(output_ids) - output_ids[::-1].index(151668)
-        thinking_content = tokenizer.decode(output_ids[:index], skip_special_tokens=True)
-        content = tokenizer.decode(output_ids[index:], skip_special_tokens=True)
-    except:
-        content = tokenizer.decode(output_ids, skip_special_tokens=True)
-
-    return content.strip()
+    return response_text
 
 @app.route('/api/ask-ai', methods=['POST'])
 def api_ask_ai():
