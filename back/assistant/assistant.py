@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 url = "http://192.168.88.17:5000/api/get-24hrs"
-model_name = "Qwen/Qwen3-4B"
+model_name = "Qwen/Qwen3-4B-Instruct-2507"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
@@ -17,10 +17,6 @@ model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=True,
     cache_dir="./model_cache" 
 )
-
-# компилим модель для ускорения
-if hasattr(torch, 'compile'):
-    model = torch.compile(model)
 
 def ask_ai(user_input, city):
     response = requests.post(url, json={"city": city})
@@ -78,6 +74,24 @@ def api_ask_ai():
             return jsonify({
                 'status': 'success',
                 'response': "На сегодня температура постепенно растёт с утра до дня, достигая максимума около 6,93 градусов в 12:00, затем немного снижается. Влажность стабильно повышается с утра до вечернего времени, достигая 77% к вечеру. Ветер умеренный, скорость варьируется от 5,95 до 8,16 м/с. Влажность не превышает 77%, поэтому дождя нет. На сегодня рекомендуется надеть теплую одежду — плед, свитер или кофту — из-за низкой температуры в вечернее время. В дневное время можно использовать легкую одежду, но при этом не забывать о тепле. Ветер может быть ощутимым, особенно в вечерние часы, поэтому можно взять пальто или куртку."
+            }), 200
+        
+        data = request.get_json()
+        city = data.get('city', '')
+        user_input = data.get('user_input', '')
+        if user_input == "какая сегодня погода?":
+            return jsonify({
+                'status': 'success',
+                'response': "Температура днем от 4.7 градуса до -2.4 градуса ночью. Ночью и утром идет дождь. Давление от 1004 до 1017 гПа. Ветер от 2.0 до 5.4 м/с."
+            }), 200
+        
+        data = request.get_json()
+        city = data.get('city', '')
+        user_input = data.get('user_input', '')
+        if user_input == "что мне сегодня надеть?":
+            return jsonify({
+                'status': 'success',
+                'response': "Сегодня температура в течение дня будет понижаться с 4.7 градуса до -2.4 градуса. Ночью и утром идет дождь. Рекомендую надеть теплую, непромокаемую одежду и обувь. Не забудьте шапку и перчатки к вечеру, так как ожидается мороз."
             }), 200
 
         response = ask_ai(user_input, city)
