@@ -327,7 +327,7 @@ def ask_ai():
     data = request.get_json()
 
     r = requests.post(
-        "http://192.168.88.17:5050/api/ask-ai",
+        "http://192.168.88.40:5050/api/ask-ai",
         json=data,
     )
 
