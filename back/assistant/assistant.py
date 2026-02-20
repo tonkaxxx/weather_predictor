@@ -11,7 +11,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# url = "http://192.168.88.79:5000/api/get-24hrs"
+url = "http://192.168.88.79:5000/api/get-24hrs"
 # model_name = "Qwen/Qwen3-4B-Instruct-2507"
 # tokenizer = AutoTokenizer.from_pretrained(model_name)
 # model = AutoModelForCausalLM.from_pretrained(
@@ -116,7 +116,7 @@ def ask_gigachat(user_input, city):
     auth = os.getenv("AUTH")
 
     response_giga = get_token(auth)
-    if response != 1:
+    if response_giga != 1:
         print(response_giga.text)
         giga_token = response_giga.json()['access_token']
 
