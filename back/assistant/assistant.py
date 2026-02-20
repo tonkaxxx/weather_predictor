@@ -1,8 +1,8 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+# from transformers import AutoModelForCausalLM, AutoTokenizer
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import torch
+# import torch
 import uuid
 import json
 from dotenv import load_dotenv
@@ -11,16 +11,16 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-url = "http://192.168.88.79:5000/api/get-24hrs"
-model_name = "Qwen/Qwen3-4B-Instruct-2507"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    dtype=torch.float16,
-    device_map="auto",
-    trust_remote_code=True,
-    cache_dir="./model_cache" 
-)
+# url = "http://192.168.88.79:5000/api/get-24hrs"
+# model_name = "Qwen/Qwen3-4B-Instruct-2507"
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
+# model = AutoModelForCausalLM.from_pretrained(
+#     model_name,
+#     dtype=torch.float16,
+#     device_map="auto",
+#     trust_remote_code=True,
+#     cache_dir="./model_cache" 
+# )
 
 
 def get_token(auth_token, scope='GIGACHAT_API_PERS'):
