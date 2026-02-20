@@ -1,17 +1,22 @@
-FROM python:3.9-slim
+FROM python:3.9-alpine AS builder
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     gcc \
     g++ \
-    && rm -rf /var/lib/apt/lists/*
+    musl-dev \
+    linux-headers
+
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+FROM python:3.9-alpine
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-# RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
-
+COPY --from=builder /root/.local /root/.local
 COPY . .
+
+ENV PATH=/root/.local/bin:$PATH
 
 EXPOSE 5050
 CMD ["python", "assistant.py"]
